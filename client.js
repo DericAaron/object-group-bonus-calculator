@@ -19,61 +19,56 @@ class Employee{
 
 console.log( employees );
 
-function bonusPerc( rating ){
-  let bonusP = 0;
-
-  if(rating === 3){
-      bonusP = 4;
-  }
-  else if(rating ===4){
-    bonusP = 6;
-  }
-  else if(rating === 5 ){
-    bonusP =  10;
-  }
-}
-
-function bonusVetModifier(totalBonus, number){
-  if(number.length === 4){
-    totalBonus*= 1.05;
-  }
-  return totalBonus;
-}
-
-function bonusSalModifier(totalBonus, salary){
-  if(parseInt(salary) > 65000){
-    totalBonus = totalBonus * (99/100);
-  }
-  return totalBonus;
-}
-
-
-function bonusBounds(totalBonus, salary){
-  let bonusPerc = totalBonus/salary * 100;
-  let boundedBonus = bonusPerc;
-  if(bonusPerc < 0){
-    boundedBonus = 0;
-  }
-  else if(bonusPerc > 13){
-    boundedBonus = 13;
-  }
-  return boundedBonus * salary / 100;
-}
-
-
 let employeesFromClass = [];
 
 function setEmployee( empObject ){
-  let percentInt = bonusPerc(empObject.reviewRating);
-  let salaryInt = parseInt(empObject.annualSalary);
-  let totalBonus = (percentInt/100) * parseInt(empObject.annualSalary);
-  totalBonus = bonusVetModifier(totalBonus, empObject.employeeNumber);
-  totalBonus = bonusSalModifier(totalBonus, salaryInt);
-  totalBonus = bonusBounds(totalBonus, salaryInt);
-  let totalCompensation = totalBonus + salaryInt;
-  employeesFromClass.push(new Employee(empObject.name, percentInt, totalBonus, totalCompensation));
-}
 
-for(employee of employees){
-  setEmployee(employee);
+  let percentInt = percentage(empObject.reviewRating, empObject.annualSalary, empObject.employeeNumber);
+  let salaryInt = parseInt(empObject.annualSalary);
+  let totalBonus = (percentInt/100) * salaryInt;
+  let totalCompensation = totalBonus + salaryInt;
+  employeesFromClass.push(new Employee(empObject.name, percentInt, totalCompensation, totalBonus));
+}
+$(document).ready(function(){
+  for(employee of employees){
+    setEmployee(employee);
+  }
+
+  $('#button').on('click', function(){
+    for (employee of employeesFromClass){
+      $('#employList').append('<li>'+employee.name+': Percentage = '+ employee.bonusPercentage+
+      ' Compensation = '+employee.totalCompensation+' Bonus = '+employee.totalBonus +'</li>')
+    }
+  });
+});
+
+
+function percentage( rating, salary, number){
+  let percentage = 0;
+
+  if (rating <= 2){
+    return 0;
+  }
+  else if(rating === 3){
+    percentage = 4;
+  }
+  else if(rating=== 4){
+    percentage = 6;
+  }
+  else if(rating === 5){
+    percentage = 10;
+  }
+
+  if(number.length === 4){
+    percentage += 5;
+  }
+
+  if(parseInt(salary) > 65000){
+    percentage--;
+  }
+
+  if(percentage > 13){
+    percentage = 13;
+  }
+  return percentage;
 }
